@@ -14,7 +14,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Table(name="weixin_user")
-public class WeixinUser extends BaseEntity implements Serializable {
+public class WeixinUser implements Serializable {
     @Id
     @NotNull(groups = BaseEntity.Update.class)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +22,7 @@ public class WeixinUser extends BaseEntity implements Serializable {
     private Long id;
 
     @NotBlank
-    @Column(unique = true)
+    @Column(unique = true, name = "open_id")
     @ApiModelProperty(value = "微信的open_id")
     private String openId;
 

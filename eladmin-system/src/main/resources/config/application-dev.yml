@@ -83,6 +83,8 @@ jwt:
   token-validity-in-seconds: 14400000
   # 在线用户key
   online-key: online-token-
+  # 微信session key
+  session-key: wx-session-key-
   # 验证码
   code-key: code-key-
   # token 续期检查时间范围（默认30分钟，单位毫秒），在token即将过期的一段时间内用户操作了，则给用户的token续期

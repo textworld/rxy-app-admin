@@ -52,6 +52,11 @@ public class SecurityProperties {
     private String onlineKey;
 
     /**
+     * 微信小程序返回的session key在redis中的key name
+     */
+    private String wxSessionKey;
+
+    /**
      * 验证码 key
      */
     private String codeKey;

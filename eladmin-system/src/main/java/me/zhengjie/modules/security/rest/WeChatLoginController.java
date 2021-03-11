@@ -10,7 +10,10 @@ import me.zhengjie.modules.security.security.TokenProvider;
 import me.zhengjie.modules.security.service.OnlineUserService;
 import me.zhengjie.modules.security.service.WeixinService;
 import me.zhengjie.modules.security.service.dto.JwtUserDto;
+import me.zhengjie.modules.security.service.dto.WxSessionDTO;
+import me.zhengjie.modules.system.domain.WeixinUser;
 import me.zhengjie.modules.system.service.WeixinUserService;
+import me.zhengjie.utils.RedisUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,13 +43,18 @@ public class WeChatLoginController {
     private final TokenProvider tokenProvider;
     private final OnlineUserService onlineUserService;
     private final SecurityProperties properties;
+    private final RedisUtils redisUtils;
 
     @AnonymousAccess
     @GetMapping(value = "/code")
-    public ResponseEntity<Object> authCode2Session(HttpServletRequest request, HttpServletResponse response, String code) {
-        //weixinService.fetchOpenIdFromRemote(code);
+    public ResponseEntity<Object> authCode2Session(HttpServletRequest request, HttpServletResponse response, String code) throws IOException, URISyntaxException {
+        WxSessionDTO sessionDTO = weixinService.fetchOpenIdFromRemote(code);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername("rd_lkVIH");
+        WeixinUser wxUser = weixinUserService.create(sessionDTO.getOpenid());
+
+        redisUtils.set(properties.getWxSessionKey() + sessionDTO.getOpenid(), sessionDTO.getSessionKey(), 0);
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(wxUser.getUser().getUsername());
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = tokenProvider.createToken(authentication);

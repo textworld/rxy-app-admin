@@ -57,7 +57,7 @@ public class WeixinService {
             log.info("body: {}", resultString);
 
             WxSessionDTO dto = objectMapper.readValue(resultString, WxSessionDTO.class);
-            if (dto.getErrcode() != 0) {
+            if (dto.getErrcode() != null && dto.getErrcode() != 0) {
                 log.error("invalid weixin session: {}", resultString);
                 throw new IOException(dto.getErrmsg());
             }

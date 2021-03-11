@@ -1,8 +1,10 @@
 package me.zhengjie.modules.system.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import me.zhengjie.modules.system.domain.Dept;
 import me.zhengjie.modules.system.domain.User;
 import me.zhengjie.modules.system.domain.WeixinUser;
+import me.zhengjie.modules.system.repository.DeptRepository;
 import me.zhengjie.modules.system.repository.UserRepository;
 import me.zhengjie.modules.system.repository.WeixinUserRepository;
 import me.zhengjie.modules.system.service.UserService;
@@ -12,12 +14,16 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = "user")
 public class WeixinUserServiceImpl implements WeixinUserService {
     private final WeixinUserRepository weixinUserRepository;
     private final UserService userService;
+    private final UserRepository userRepository;
+    private final DeptRepository deptRepository;
 
     @Override
     @Transactional
@@ -28,10 +34,11 @@ public class WeixinUserServiceImpl implements WeixinUserService {
         }else{
             User user = new User();
             String randomUsername = "rd_" + RandomStringUtils.randomAlphabetic(10);
-            while (userService.findByName(randomUsername) != null) {
+            while (userRepository.findByUsername(randomUsername) != null) {
                 randomUsername= "rd_" + RandomStringUtils.randomAlphabetic(10);
             }
 
+            Optional<Dept> dept = deptRepository.findById(2L);
             String randomPhone = "0" + RandomStringUtils.randomNumeric(10);
             user.setEmail(randomUsername + "@textworld.cn");
             user.setPassword(RandomStringUtils.randomAlphanumeric(10));
@@ -40,6 +47,7 @@ public class WeixinUserServiceImpl implements WeixinUserService {
             user.setPhone(randomPhone);
             user.setEnabled(true);
             user.setIsAdmin(false);
+            user.setDept(dept.get());
             userService.create(user);
 
             WeixinUser weixinUser = new WeixinUser();

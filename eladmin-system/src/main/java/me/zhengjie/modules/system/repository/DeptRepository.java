@@ -28,7 +28,6 @@ import java.util.Set;
 * @date 2019-03-25
 */
 public interface DeptRepository extends JpaRepository<Dept, Long>, JpaSpecificationExecutor<Dept> {
-
     /**
      * 根据 PID 查询
      * @param id pid
